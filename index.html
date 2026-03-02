@@ -5,28 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YUANYE 2026</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
   margin:40px 24px;
   background:#fff;
   color:#111;
-}
-
-/* LOGO */
-.logo{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  margin-bottom:40px;
-}
-.logo img{ width:140px; }
-.logo-name{
-  margin-top:10px;
-  font-size:14px;
-  letter-spacing:3px;
 }
 
 /* HEADER */
@@ -37,160 +21,84 @@ body{
   margin-bottom:50px;
 }
 .year{
-  font-size:32px;
-  font-weight:600;
-  letter-spacing:3px;
+  font-size:28px;
+  font-weight:500;
+  line-height:1.2;
+  text-transform:uppercase;
 }
-.clock{text-align:right;}
 .time{
   background:#000;
   color:#fff;
   font-size:32px;
   padding:8px 14px;
-  letter-spacing:2px;
 }
 .date{
-  font-size:11px;
+  font-size:12px;
   margin-top:6px;
-  letter-spacing:1px;
 }
 
-/* SECTION */
-h2{
-  font-size:14px;
-  border-bottom:1px solid #000;
-  padding-bottom:6px;
-  cursor:pointer;
-}
-.section-title{
-  font-size:11px;
-  margin-top:12px;
-  margin-bottom:4px;
-  letter-spacing:1px;
-}
-textarea{
-  width:100%;
-  border:none;
-  border-bottom:1px solid #eee;
-  resize:none;
-  outline:none;
-  margin-bottom:6px;
-  font-size:12px;
-}
+/* MONTH */
 .month{ margin-bottom:50px; }
-.month-content{ display:none; margin-top:15px; }
+.month-content{ display:none; margin-top:20px; }
 .month.active .month-content{ display:block; }
 
-.week{ margin-top:20px; }
+.week{
+  margin-bottom:25px;
+  padding-bottom:10px;
+  border-bottom:1px solid #eee;
+}
 
-.days-grid{
+.week-title{
+  font-size:11px;
+  margin-bottom:8px;
+  letter-spacing:1px;
+}
+
+.day-row{
   display:grid;
   grid-template-columns:1fr repeat(3,20px);
   gap:6px;
   align-items:center;
-  margin-top:6px;
+  font-size:12px;
+  margin-bottom:4px;
 }
 
 .day-left{
   display:flex;
   justify-content:space-between;
-  font-size:12px;
 }
 
-.day-name{ font-weight:500; }
-.day-date{ opacity:0.6; }
+.day-date{ opacity:0.5; }
 
 input[type="checkbox"]{
   width:16px;
   height:16px;
 }
 
-/* ===== MOBILE HEADER SCALE ===== */
-@media screen and (max-width: 768px){
-
-  .year{
-    font-size:16px !important;
-  }
-
-  .time{
-    font-size:16px !important;
-    padding:4px 8px !important;
-  }
-
-  .date{
-    font-size:9px !important;
-  }
-
-  .logo img{
-    width:90px !important;
-  }
-
+/* MOBILE */
+@media screen and (max-width:768px){
+  .year{ font-size:16px !important; }
+  .time{ font-size:16px !important; padding:4px 8px !important; }
+  .date{ font-size:9px !important; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="logo">
-  <img src="logo.png" alt="">
-  <div class="logo-name">YUANYE</div>
-</div>
-
 <div class="header">
-  <div class="year">2026</div>
-  <div class="clock">
+  <div class="year">
+    TAKE RISK,<br>DON'T REGRET.
+  </div>
+  <div>
     <div class="time" id="time"></div>
     <div class="date" id="date"></div>
   </div>
 </div>
 
-<h2>YEAR GOALS (3)</h2>
-<textarea data-key="year1"></textarea>
-<textarea data-key="year2"></textarea>
-<textarea data-key="year3"></textarea>
-
 <div id="container"></div>
 
 <script>
-
-/* SUPABASE */
-const supabaseUrl = "https://cbktbimwqilzhanxthln.supabase.co";
-const supabaseKey = "sb_publishable_O1Wv4Qg9GO19JFD2Veu49A_-6sQBDpm";
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-async function saveToCloud(key,value){
-  if(value === undefined || value === null) return;
-  await supabaseClient
-    .from("entries")
-    .upsert({ key:key, value:String(value) },{ onConflict:"key" });
-}
-
-document.addEventListener("input",e=>{
-  if(e.target.dataset.key){
-    saveToCloud(e.target.dataset.key,e.target.value);
-  }
-});
-
-document.addEventListener("change",e=>{
-  if(e.target.dataset.key){
-    const val = e.target.type==="checkbox" ? e.target.checked : e.target.value;
-    saveToCloud(e.target.dataset.key,val);
-  }
-});
-
-async function loadAll(){
-  const { data } = await supabaseClient.from("entries").select("*");
-  if(!data) return;
-  data.forEach(row=>{
-    const el=document.querySelector(`[data-key="${row.key}"]`);
-    if(!el) return;
-    if(el.type==="checkbox"){
-      el.checked=row.value==="true";
-    }else{
-      el.value=row.value;
-    }
-  });
-}
 
 /* CLOCK */
 function updateClock(){
@@ -198,63 +106,71 @@ function updateClock(){
   document.getElementById("time").innerText=
     now.toTimeString().split(" ")[0];
   document.getElementById("date").innerText=
-    now.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+    now.toLocaleDateString("en-US",
+      {weekday:"short",year:"numeric",month:"short",day:"numeric"});
 }
 setInterval(updateClock,1000);
 updateClock();
 
-/* MONTH GENERATOR */
+/* GENERATE 2026 FROM MARCH 1 */
 const container=document.getElementById("container");
-const today=new Date();
-const currentMonthIndex=today.getMonth();
 
-for(let m=0;m<12;m++){
+for(let m=2;m<12;m++){   // 2 = March
 
   const monthDiv=document.createElement("div");
   monthDiv.className="month";
-  if(m===currentMonthIndex) monthDiv.classList.add("active");
 
-  const monthName=new Date(2026,m).toLocaleString('default',{month:'long',year:'numeric'});
+  const monthName=new Date(2026,m)
+    .toLocaleString("en-US",{month:"long",year:"numeric"});
 
   monthDiv.innerHTML=`
-    <h2 onclick="this.parentElement.classList.toggle('active')">${monthName}</h2>
-    <div class="month-content">
-      <div class="section-title">MONTH FOCUS (3)</div>
-      <textarea data-key="month_${m}_1"></textarea>
-      <textarea data-key="month_${m}_2"></textarea>
-      <textarea data-key="month_${m}_3"></textarea>
-    </div>
+    <h2 onclick="this.parentElement.classList.toggle('active')">
+      ${monthName}
+    </h2>
+    <div class="month-content"></div>
   `;
 
   const content=monthDiv.querySelector(".month-content");
+  const daysInMonth=new Date(2026,m+1,0).getDate();
 
-  const daysInMonth = new Date(2026, m+1, 0).getDate();
+  let weekCount=1;
+  let weekDiv=document.createElement("div");
+  weekDiv.className="week";
+  weekDiv.innerHTML=`<div class="week-title">WEEK ${weekCount}</div>`;
+  content.appendChild(weekDiv);
 
-  for(let day=1; day<=daysInMonth; day++){
+  for(let d=1; d<=daysInMonth; d++){
 
-    const dateObj = new Date(2026, m, day);
-    const monthNum = String(m+1).padStart(2,'0');
-    const dayNum = String(day).padStart(2,'0');
+    const dateObj=new Date(2026,m,d);
+    const weekday=dateObj.getDay(); // Sunday=0
 
-    const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const dayLabel=dayNames[dateObj.getDay()];
+    if(d!==1 && weekday===0){
+      weekCount++;
+      weekDiv=document.createElement("div");
+      weekDiv.className="week";
+      weekDiv.innerHTML=`<div class="week-title">WEEK ${weekCount}</div>`;
+      content.appendChild(weekDiv);
+    }
 
-    content.innerHTML+=`
-    <div class="days-grid">
-      <div class="day-left">
-        <span class="day-name">${dayLabel}</span>
-        <span class="day-date">${monthNum}/${dayNum}</span>
+    const dayName=dateObj.toLocaleString("en-US",{weekday:"short"});
+    const dateText=dateObj.toLocaleDateString("en-US",
+      {month:"2-digit",day:"2-digit"});
+
+    weekDiv.innerHTML+=`
+      <div class="day-row">
+        <div class="day-left">
+          <span>${dayName}</span>
+          <span class="day-date">${dateText}</span>
+        </div>
+        <input type="checkbox">
+        <input type="checkbox">
+        <input type="checkbox">
       </div>
-      <input type="checkbox" data-key="m${m}d${day}a">
-      <input type="checkbox" data-key="m${m}d${day}b">
-      <input type="checkbox" data-key="m${m}d${day}c">
-    </div>`;
+    `;
   }
 
   container.appendChild(monthDiv);
 }
-
-loadAll();
 
 </script>
 </body>
