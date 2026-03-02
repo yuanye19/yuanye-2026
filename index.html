@@ -8,16 +8,28 @@
 <!-- Supabase CDN 只加载一次 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  @media (max-width: 768px) {
-  ...
-}
 <style>
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
   margin:40px 24px;
   background:#fff;
   color:#111;
-}
+  /* ===== Mobile 50% Scale ===== */
+@media (max-width: 768px) {
+
+  .year {
+    font-size: 16px;   /* 原本 32px → 16px */
+  }
+
+  .time {
+    font-size: 16px;   /* 原本 32px → 16px */
+    padding: 4px 8px;
+  }
+
+  .date {
+    font-size: 9px;
+  }
+
 
 /* LOGO */
 .logo{
