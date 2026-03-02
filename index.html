@@ -8,27 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  /* ===== MOBILE HEADER SCALE ===== */
-@media screen and (max-width: 768px) {
-
-  .year {
-    font-size: 16px;
-  }
-
-  .time {
-    font-size: 16px;
-    padding: 4px 8px;
-  }
-
-  .date {
-    font-size: 9px;
-  }
-
-  .logo img {
-    width: 90px;
-  }
-
-}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
   margin:40px 24px;
@@ -124,6 +103,28 @@ textarea{
 input[type="checkbox"]{
   width:16px;
   height:16px;
+}
+
+/* ===== MOBILE HEADER SCALE ===== */
+@media screen and (max-width: 768px){
+
+  .year{
+    font-size:16px !important;
+  }
+
+  .time{
+    font-size:16px !important;
+    padding:4px 8px !important;
+  }
+
+  .date{
+    font-size:9px !important;
+  }
+
+  .logo img{
+    width:90px !important;
+  }
+
 }
 </style>
 </head>
@@ -227,41 +228,27 @@ for(let m=0;m<12;m++){
 
   const content=monthDiv.querySelector(".month-content");
 
-  for(let w=0; w<6; w++){
+  const daysInMonth = new Date(2026, m+1, 0).getDate();
 
-    let weekHTML=`
-    <div class="week">
-      <div class="section-title">WEEK ${w+1} FOCUS (3)</div>
-      <textarea data-key="m${m}w${w}_1"></textarea>
-      <textarea data-key="m${m}w${w}_2"></textarea>
-      <textarea data-key="m${m}w${w}_3"></textarea>
-    `;
+  for(let day=1; day<=daysInMonth; day++){
 
-    for(let d=0; d<7; d++){
+    const dateObj = new Date(2026, m, day);
+    const monthNum = String(m+1).padStart(2,'0');
+    const dayNum = String(day).padStart(2,'0');
 
-      const dateObj = new Date(2026, m, 1 + w*7 + d);
-      if(dateObj.getMonth() !== m) continue;
+    const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const dayLabel=dayNames[dateObj.getDay()];
 
-      const monthNum = String(m+1).padStart(2,'0');
-      const dayNum = String(dateObj.getDate()).padStart(2,'0');
-
-      const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-      const dayLabel=dayNames[dateObj.getDay()];
-
-      weekHTML+=`
-      <div class="days-grid">
-        <div class="day-left">
-          <span class="day-name">${dayLabel}</span>
-          <span class="day-date">${monthNum}/${dayNum}</span>
-        </div>
-        <input type="checkbox" data-key="m${m}w${w}d${d}a">
-        <input type="checkbox" data-key="m${m}w${w}d${d}b">
-        <input type="checkbox" data-key="m${m}w${w}d${d}c">
-      </div>`;
-    }
-
-    weekHTML+=`</div>`;
-    content.innerHTML+=weekHTML;
+    content.innerHTML+=`
+    <div class="days-grid">
+      <div class="day-left">
+        <span class="day-name">${dayLabel}</span>
+        <span class="day-date">${monthNum}/${dayNum}</span>
+      </div>
+      <input type="checkbox" data-key="m${m}d${day}a">
+      <input type="checkbox" data-key="m${m}d${day}b">
+      <input type="checkbox" data-key="m${m}d${day}c">
+    </div>`;
   }
 
   container.appendChild(monthDiv);
