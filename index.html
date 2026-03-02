@@ -142,9 +142,14 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* SAVE FUNCTION */
 async function saveToCloud(key,value){
+  if(value === undefined || value === null) return;
+
   await supabaseClient
     .from("entries")
-    .upsert({ key:key, value:String(value) },{ onConflict:"key" });
+    .upsert(
+      { key:key, value:String(value) },
+      { onConflict:"key" }
+    );
 }
 
 /* AUTO SAVE */
