@@ -71,7 +71,7 @@ body{
   margin-bottom:12px;
 }
 
-/* TEXTAREA COLORS */
+/* GOAL COLORS */
 .goal-blue{ color:var(--blue); }
 .goal-green{ color:var(--green); }
 .goal-red{ color:var(--red); }
@@ -99,15 +99,26 @@ textarea{
   display:block;
 }
 
+/* WEEK */
 .week{
   margin-bottom:20px;
-  padding-bottom:10px;
+  padding-bottom:12px;
   border-bottom:1px solid #eee;
+}
+.week-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
 }
 .week-title{
   font-size:11px;
-  margin-bottom:6px;
+  font-weight:600;   /* 加粗 */
   letter-spacing:1px;
+}
+.week-progress{
+  font-size:11px;
+  opacity:0.6;
 }
 
 /* DAY ROW */
@@ -128,7 +139,7 @@ textarea{
   opacity:0.5;
 }
 
-/* COLORED CHECKBOXES */
+/* CHECKBOX */
 input[type="checkbox"]{
   width:18px;
   height:18px;
@@ -216,14 +227,12 @@ for(let m=2;m<12;m++){
       ${monthName}
     </h2>
     <div class="month-content">
-
       <div class="section">
         <h2>MONTH FOCUS (3)</h2>
         <textarea class="goal-blue"></textarea>
         <textarea class="goal-green"></textarea>
         <textarea class="goal-red"></textarea>
       </div>
-
     </div>
   `;
 
@@ -231,14 +240,7 @@ for(let m=2;m<12;m++){
   const daysInMonth=new Date(2026,m+1,0).getDate();
 
   let weekCount=1;
-  let weekDiv=document.createElement("div");
-  weekDiv.className="week";
-  weekDiv.innerHTML=`
-    <div class="week-title">WEEK ${weekCount}</div>
-    <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
-    <textarea class="goal-green" placeholder="Week focus 2"></textarea>
-    <textarea class="goal-red" placeholder="Week focus 3"></textarea>
-  `;
+  let weekDiv=createWeek(weekCount);
   content.appendChild(weekDiv);
 
   for(let d=1; d<=daysInMonth; d++){
@@ -248,14 +250,7 @@ for(let m=2;m<12;m++){
 
     if(d!==1 && weekday===0){
       weekCount++;
-      weekDiv=document.createElement("div");
-      weekDiv.className="week";
-      weekDiv.innerHTML=`
-        <div class="week-title">WEEK ${weekCount}</div>
-        <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
-        <textarea class="goal-green" placeholder="Week focus 2"></textarea>
-        <textarea class="goal-red" placeholder="Week focus 3"></textarea>
-      `;
+      weekDiv=createWeek(weekCount);
       content.appendChild(weekDiv);
     }
 
@@ -263,20 +258,53 @@ for(let m=2;m<12;m++){
     const dateText=dateObj.toLocaleDateString("en-US",
       {month:"2-digit",day:"2-digit"});
 
-    weekDiv.innerHTML+=`
-      <div class="day-row">
-        <div class="day-left">
-          <span>${dayName}</span>
-          <span class="day-date">${dateText}</span>
-        </div>
-        <input type="checkbox" class="cb-blue">
-        <input type="checkbox" class="cb-green">
-        <input type="checkbox" class="cb-red">
+    const row=document.createElement("div");
+    row.className="day-row";
+    row.innerHTML=`
+      <div class="day-left">
+        <span>${dayName}</span>
+        <span class="day-date">${dateText}</span>
       </div>
+      <input type="checkbox" class="cb-blue">
+      <input type="checkbox" class="cb-green">
+      <input type="checkbox" class="cb-red">
     `;
+    weekDiv.appendChild(row);
   }
 
   container.appendChild(monthDiv);
+}
+
+/* CREATE WEEK BLOCK */
+function createWeek(num){
+  const week=document.createElement("div");
+  week.className="week";
+
+  week.innerHTML=`
+    <div class="week-header">
+      <div class="week-title">WEEK ${num}</div>
+      <div class="week-progress">0%</div>
+    </div>
+    <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
+    <textarea class="goal-green" placeholder="Week focus 2"></textarea>
+    <textarea class="goal-red" placeholder="Week focus 3"></textarea>
+  `;
+
+  week.addEventListener("change",updateProgress);
+
+  return week;
+}
+
+/* WEEK COMPLETION CALC */
+function updateProgress(e){
+  const week=e.currentTarget;
+  const boxes=week.querySelectorAll('input[type="checkbox"]');
+  const checked=week.querySelectorAll('input[type="checkbox"]:checked');
+
+  if(boxes.length===0) return;
+
+  const percent=Math.round((checked.length/boxes.length)*100);
+  week.querySelector(".week-progress").innerText=percent+"%";
 }
 
 </script>
