@@ -15,8 +15,18 @@ body{
 
 /* LOGO */
 .logo{
-  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
   margin-bottom:40px;
+}
+
+.logo-img{
+  width:120px;
+  margin-bottom:10px;
+}
+
+.logo-text{
   font-size:14px;
   letter-spacing:4px;
 }
@@ -127,13 +137,17 @@ input[type="checkbox"]{
   .slogan{ font-size:16px !important; }
   .time{ font-size:16px !important; padding:4px 8px !important; }
   .date{ font-size:9px !important; }
+  .logo-img{ width:80px !important; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="logo">YUANYE</div>
+<div class="logo">
+  <img src="logo.png" class="logo-img">
+  <div class="logo-text">YUANYE</div>
+</div>
 
 <div class="header">
   <div class="slogan">
@@ -161,6 +175,7 @@ function updateClock(){
   const now=new Date();
   document.getElementById("time").innerText=
     now.toTimeString().split(" ")[0];
+
   document.getElementById("date").innerText=
     now.toLocaleDateString("en-US",
       {weekday:"short",year:"numeric",month:"short",day:"numeric"});
