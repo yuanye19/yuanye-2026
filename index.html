@@ -165,15 +165,23 @@ input[type="checkbox"]{
 
 <script>
 
-/* SUPABASE */
+/* ===== SUPABASE CONFIG ===== */
 const supabaseUrl="https://cbktbimwqilzhanxthln.supabase.co";
 const supabaseKey="sb_publishable_O1Wv4Qg9GO19JFD2Veu49A_-6sQBDpm";
 const supabaseClient=window.supabase.createClient(supabaseUrl,supabaseKey);
 
+/* ===== SAFE SAVE ===== */
 async function saveToCloud(key,value){
+  if(value === undefined || value === null) return;
+
+  const cleanValue = String(value);
+
   await supabaseClient
     .from("entries")
-    .upsert({key,value:String(value)},{onConflict:"key"});
+    .upsert(
+      { key: key, value: cleanValue },
+      { onConflict: "key" }
+    );
 }
 
 document.addEventListener("input",e=>{
@@ -188,21 +196,33 @@ document.addEventListener("change",e=>{
   }
 });
 
+/* ===== LOAD ===== */
 async function loadAll(){
-  const {data}=await supabaseClient.from("entries").select("*");
-  if(!data) return;
+  const {data,error}=await supabaseClient
+    .from("entries")
+    .select("*");
+
+  if(error) return;
+
   data.forEach(row=>{
+    if(!row.key) return;
+
     const el=document.querySelector(`[data-key="${row.key}"]`);
     if(!el) return;
+
     if(el.type==="checkbox"){
-      el.checked=row.value==="true";
+      el.checked = row.value === "true";
     }else{
-      el.value=row.value;
+      if(row.value !== "undefined"){
+        el.value = row.value;
+      }
     }
   });
+
+  recalcAllWeeks();
 }
 
-/* CLOCK */
+/* ===== CLOCK ===== */
 function updateClock(){
   const now=new Date();
   document.getElementById("time").innerText=
@@ -214,7 +234,7 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-/* GENERATE */
+/* ===== GENERATE ===== */
 const container=document.getElementById("container");
 
 for(let m=2;m<12;m++){
@@ -261,17 +281,18 @@ for(let m=2;m<12;m++){
     const dateText=dateObj.toLocaleDateString("en-US",
       {month:"2-digit",day:"2-digit"});
 
-    weekDiv.innerHTML+=`
-      <div class="day-row">
-        <div class="day-left">
-          <span>${dayName}</span>
-          <span class="day-date">${dateText}</span>
-        </div>
-        <input type="checkbox" class="cb-blue" data-key="m${m}w${weekCount}d${d}a">
-        <input type="checkbox" class="cb-green" data-key="m${m}w${weekCount}d${d}b">
-        <input type="checkbox" class="cb-red" data-key="m${m}w${weekCount}d${d}c">
+    const row=document.createElement("div");
+    row.className="day-row";
+    row.innerHTML=`
+      <div class="day-left">
+        <span>${dayName}</span>
+        <span class="day-date">${dateText}</span>
       </div>
+      <input type="checkbox" class="cb-blue" data-key="m${m}w${weekCount}d${d}a">
+      <input type="checkbox" class="cb-green" data-key="m${m}w${weekCount}d${d}b">
+      <input type="checkbox" class="cb-red" data-key="m${m}w${weekCount}d${d}c">
     `;
+    weekDiv.appendChild(row);
   }
 
   container.appendChild(monthDiv);
@@ -292,10 +313,10 @@ function createWeek(m,num){
   `;
 
   week.addEventListener("change",updateProgress);
-
   return week;
 }
 
+/* ===== PROGRESS ===== */
 function updateProgress(e){
   const week=e.currentTarget;
   const boxes=week.querySelectorAll('input[type="checkbox"]');
@@ -305,6 +326,16 @@ function updateProgress(e){
 
   const percent=Math.round((checked.length/boxes.length)*100);
   week.querySelector(".week-progress").innerText=percent+"%";
+}
+
+function recalcAllWeeks(){
+  document.querySelectorAll(".week").forEach(week=>{
+    const boxes=week.querySelectorAll('input[type="checkbox"]');
+    const checked=week.querySelectorAll('input[type="checkbox"]:checked');
+    if(boxes.length===0) return;
+    const percent=Math.round((checked.length/boxes.length)*100);
+    week.querySelector(".week-progress").innerText=percent+"%";
+  });
 }
 
 loadAll();
