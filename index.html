@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YUANYE 2026</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
@@ -13,30 +15,21 @@ body{
   color:#111;
 }
 
-/* COLORS */
 :root{
   --blue:#0B3D91;
   --green:#0B6E4F;
   --red:#8B1E3F;
 }
 
-/* LOGO */
 .logo{
   display:flex;
   flex-direction:column;
   align-items:center;
   margin-bottom:40px;
 }
-.logo-img{
-  width:120px;
-  margin-bottom:10px;
-}
-.logo-text{
-  font-size:14px;
-  letter-spacing:4px;
-}
+.logo-img{ width:120px; margin-bottom:10px; }
+.logo-text{ font-size:14px; letter-spacing:4px; }
 
-/* HEADER */
 .header{
   display:flex;
   justify-content:space-between;
@@ -55,15 +48,9 @@ body{
   font-size:32px;
   padding:8px 14px;
 }
-.date{
-  font-size:12px;
-  margin-top:6px;
-}
+.date{ font-size:12px; margin-top:6px; }
 
-/* SECTION */
-.section{
-  margin-bottom:60px;
-}
+.section{ margin-bottom:60px; }
 .section h2{
   font-size:14px;
   border-bottom:1px solid #000;
@@ -71,7 +58,6 @@ body{
   margin-bottom:12px;
 }
 
-/* GOAL COLORS */
 .goal-blue{ color:var(--blue); }
 .goal-green{ color:var(--green); }
 .goal-red{ color:var(--red); }
@@ -87,41 +73,33 @@ textarea{
   background:transparent;
 }
 
-/* MONTH */
-.month{
-  margin-bottom:50px;
-}
-.month-content{
-  display:none;
-  margin-top:15px;
-}
-.month.active .month-content{
-  display:block;
-}
+.month{ margin-bottom:50px; }
+.month-content{ display:none; margin-top:15px; }
+.month.active .month-content{ display:block; }
 
-/* WEEK */
 .week{
   margin-bottom:20px;
   padding-bottom:12px;
   border-bottom:1px solid #eee;
 }
+
 .week-header{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:8px;
 }
+
 .week-title{
   font-size:11px;
-  font-weight:600;   /* 加粗 */
+  font-weight:600;
   letter-spacing:1px;
 }
+
 .week-progress{
   font-size:11px;
   opacity:0.6;
 }
 
-/* DAY ROW */
 .day-row{
   display:grid;
   grid-template-columns:1fr repeat(3,22px);
@@ -135,11 +113,9 @@ textarea{
   display:flex;
   justify-content:space-between;
 }
-.day-date{
-  opacity:0.5;
-}
 
-/* CHECKBOX */
+.day-date{ opacity:0.5; }
+
 input[type="checkbox"]{
   width:18px;
   height:18px;
@@ -148,20 +124,10 @@ input[type="checkbox"]{
   cursor:pointer;
 }
 
-.cb-blue:checked{
-  background:var(--blue);
-  border-color:var(--blue);
-}
-.cb-green:checked{
-  background:var(--green);
-  border-color:var(--green);
-}
-.cb-red:checked{
-  background:var(--red);
-  border-color:var(--red);
-}
+.cb-blue:checked{ background:var(--blue); border-color:var(--blue); }
+.cb-green:checked{ background:var(--green); border-color:var(--green); }
+.cb-red:checked{ background:var(--red); border-color:var(--red); }
 
-/* MOBILE */
 @media screen and (max-width:768px){
   .slogan{ font-size:16px !important; }
   .time{ font-size:16px !important; padding:4px 8px !important; }
@@ -190,14 +156,51 @@ input[type="checkbox"]{
 
 <div class="section">
   <h2>YEAR GOALS (3)</h2>
-  <textarea class="goal-blue"></textarea>
-  <textarea class="goal-green"></textarea>
-  <textarea class="goal-red"></textarea>
+  <textarea class="goal-blue" data-key="year1"></textarea>
+  <textarea class="goal-green" data-key="year2"></textarea>
+  <textarea class="goal-red" data-key="year3"></textarea>
 </div>
 
 <div id="container"></div>
 
 <script>
+
+/* SUPABASE */
+const supabaseUrl="https://cbktbimwqilzhanxthln.supabase.co";
+const supabaseKey="sb_publishable_O1Wv4Qg9GO19JFD2Veu49A_-6sQBDpm";
+const supabaseClient=window.supabase.createClient(supabaseUrl,supabaseKey);
+
+async function saveToCloud(key,value){
+  await supabaseClient
+    .from("entries")
+    .upsert({key,value:String(value)},{onConflict:"key"});
+}
+
+document.addEventListener("input",e=>{
+  if(e.target.dataset.key){
+    saveToCloud(e.target.dataset.key,e.target.value);
+  }
+});
+
+document.addEventListener("change",e=>{
+  if(e.target.dataset.key){
+    saveToCloud(e.target.dataset.key,e.target.checked);
+  }
+});
+
+async function loadAll(){
+  const {data}=await supabaseClient.from("entries").select("*");
+  if(!data) return;
+  data.forEach(row=>{
+    const el=document.querySelector(`[data-key="${row.key}"]`);
+    if(!el) return;
+    if(el.type==="checkbox"){
+      el.checked=row.value==="true";
+    }else{
+      el.value=row.value;
+    }
+  });
+}
 
 /* CLOCK */
 function updateClock(){
@@ -211,7 +214,7 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-/* GENERATE 2026 FROM MARCH */
+/* GENERATE */
 const container=document.getElementById("container");
 
 for(let m=2;m<12;m++){
@@ -229,9 +232,9 @@ for(let m=2;m<12;m++){
     <div class="month-content">
       <div class="section">
         <h2>MONTH FOCUS (3)</h2>
-        <textarea class="goal-blue"></textarea>
-        <textarea class="goal-green"></textarea>
-        <textarea class="goal-red"></textarea>
+        <textarea class="goal-blue" data-key="m${m}_1"></textarea>
+        <textarea class="goal-green" data-key="m${m}_2"></textarea>
+        <textarea class="goal-red" data-key="m${m}_3"></textarea>
       </div>
     </div>
   `;
@@ -240,7 +243,7 @@ for(let m=2;m<12;m++){
   const daysInMonth=new Date(2026,m+1,0).getDate();
 
   let weekCount=1;
-  let weekDiv=createWeek(weekCount);
+  let weekDiv=createWeek(m,weekCount);
   content.appendChild(weekDiv);
 
   for(let d=1; d<=daysInMonth; d++){
@@ -250,7 +253,7 @@ for(let m=2;m<12;m++){
 
     if(d!==1 && weekday===0){
       weekCount++;
-      weekDiv=createWeek(weekCount);
+      weekDiv=createWeek(m,weekCount);
       content.appendChild(weekDiv);
     }
 
@@ -258,25 +261,23 @@ for(let m=2;m<12;m++){
     const dateText=dateObj.toLocaleDateString("en-US",
       {month:"2-digit",day:"2-digit"});
 
-    const row=document.createElement("div");
-    row.className="day-row";
-    row.innerHTML=`
-      <div class="day-left">
-        <span>${dayName}</span>
-        <span class="day-date">${dateText}</span>
+    weekDiv.innerHTML+=`
+      <div class="day-row">
+        <div class="day-left">
+          <span>${dayName}</span>
+          <span class="day-date">${dateText}</span>
+        </div>
+        <input type="checkbox" class="cb-blue" data-key="m${m}w${weekCount}d${d}a">
+        <input type="checkbox" class="cb-green" data-key="m${m}w${weekCount}d${d}b">
+        <input type="checkbox" class="cb-red" data-key="m${m}w${weekCount}d${d}c">
       </div>
-      <input type="checkbox" class="cb-blue">
-      <input type="checkbox" class="cb-green">
-      <input type="checkbox" class="cb-red">
     `;
-    weekDiv.appendChild(row);
   }
 
   container.appendChild(monthDiv);
 }
 
-/* CREATE WEEK BLOCK */
-function createWeek(num){
+function createWeek(m,num){
   const week=document.createElement("div");
   week.className="week";
 
@@ -285,9 +286,9 @@ function createWeek(num){
       <div class="week-title">WEEK ${num}</div>
       <div class="week-progress">0%</div>
     </div>
-    <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
-    <textarea class="goal-green" placeholder="Week focus 2"></textarea>
-    <textarea class="goal-red" placeholder="Week focus 3"></textarea>
+    <textarea class="goal-blue" data-key="m${m}w${num}_1"></textarea>
+    <textarea class="goal-green" data-key="m${m}w${num}_2"></textarea>
+    <textarea class="goal-red" data-key="m${m}w${num}_3"></textarea>
   `;
 
   week.addEventListener("change",updateProgress);
@@ -295,7 +296,6 @@ function createWeek(num){
   return week;
 }
 
-/* WEEK COMPLETION CALC */
 function updateProgress(e){
   const week=e.currentTarget;
   const boxes=week.querySelectorAll('input[type="checkbox"]');
@@ -306,6 +306,8 @@ function updateProgress(e){
   const percent=Math.round((checked.length/boxes.length)*100);
   week.querySelector(".week-progress").innerText=percent+"%";
 }
+
+loadAll();
 
 </script>
 </body>
