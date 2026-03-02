@@ -13,6 +13,13 @@ body{
   color:#111;
 }
 
+/* COLORS */
+:root{
+  --blue:#0B3D91;
+  --green:#0B6E4F;
+  --red:#8B1E3F;
+}
+
 /* LOGO */
 .logo{
   display:flex;
@@ -20,12 +27,10 @@ body{
   align-items:center;
   margin-bottom:40px;
 }
-
 .logo-img{
   width:120px;
   margin-bottom:10px;
 }
-
 .logo-text{
   font-size:14px;
   letter-spacing:4px;
@@ -38,24 +43,18 @@ body{
   align-items:center;
   margin-bottom:50px;
 }
-
 .slogan{
   font-size:28px;
   line-height:1.2;
   text-transform:uppercase;
 }
-
-.clock{
-  text-align:right;
-}
-
+.clock{text-align:right;}
 .time{
   background:#000;
   color:#fff;
   font-size:32px;
   padding:8px 14px;
 }
-
 .date{
   font-size:12px;
   margin-top:6px;
@@ -65,13 +64,17 @@ body{
 .section{
   margin-bottom:60px;
 }
-
 .section h2{
   font-size:14px;
   border-bottom:1px solid #000;
   padding-bottom:6px;
   margin-bottom:12px;
 }
+
+/* TEXTAREA COLORS */
+.goal-blue{ color:var(--blue); }
+.goal-green{ color:var(--green); }
+.goal-red{ color:var(--red); }
 
 textarea{
   width:100%;
@@ -81,18 +84,17 @@ textarea{
   outline:none;
   margin-bottom:8px;
   font-size:12px;
+  background:transparent;
 }
 
 /* MONTH */
 .month{
   margin-bottom:50px;
 }
-
 .month-content{
   display:none;
   margin-top:15px;
 }
-
 .month.active .month-content{
   display:block;
 }
@@ -102,16 +104,16 @@ textarea{
   padding-bottom:10px;
   border-bottom:1px solid #eee;
 }
-
 .week-title{
   font-size:11px;
   margin-bottom:6px;
   letter-spacing:1px;
 }
 
+/* DAY ROW */
 .day-row{
   display:grid;
-  grid-template-columns:1fr repeat(3,20px);
+  grid-template-columns:1fr repeat(3,22px);
   gap:6px;
   align-items:center;
   font-size:12px;
@@ -122,14 +124,30 @@ textarea{
   display:flex;
   justify-content:space-between;
 }
-
 .day-date{
   opacity:0.5;
 }
 
+/* COLORED CHECKBOXES */
 input[type="checkbox"]{
-  width:16px;
-  height:16px;
+  width:18px;
+  height:18px;
+  appearance:none;
+  border:1px solid #ccc;
+  cursor:pointer;
+}
+
+.cb-blue:checked{
+  background:var(--blue);
+  border-color:var(--blue);
+}
+.cb-green:checked{
+  background:var(--green);
+  border-color:var(--green);
+}
+.cb-red:checked{
+  background:var(--red);
+  border-color:var(--red);
 }
 
 /* MOBILE */
@@ -161,9 +179,9 @@ input[type="checkbox"]{
 
 <div class="section">
   <h2>YEAR GOALS (3)</h2>
-  <textarea></textarea>
-  <textarea></textarea>
-  <textarea></textarea>
+  <textarea class="goal-blue"></textarea>
+  <textarea class="goal-green"></textarea>
+  <textarea class="goal-red"></textarea>
 </div>
 
 <div id="container"></div>
@@ -175,7 +193,6 @@ function updateClock(){
   const now=new Date();
   document.getElementById("time").innerText=
     now.toTimeString().split(" ")[0];
-
   document.getElementById("date").innerText=
     now.toLocaleDateString("en-US",
       {weekday:"short",year:"numeric",month:"short",day:"numeric"});
@@ -202,9 +219,9 @@ for(let m=2;m<12;m++){
 
       <div class="section">
         <h2>MONTH FOCUS (3)</h2>
-        <textarea></textarea>
-        <textarea></textarea>
-        <textarea></textarea>
+        <textarea class="goal-blue"></textarea>
+        <textarea class="goal-green"></textarea>
+        <textarea class="goal-red"></textarea>
       </div>
 
     </div>
@@ -218,9 +235,9 @@ for(let m=2;m<12;m++){
   weekDiv.className="week";
   weekDiv.innerHTML=`
     <div class="week-title">WEEK ${weekCount}</div>
-    <textarea placeholder="Week focus 1"></textarea>
-    <textarea placeholder="Week focus 2"></textarea>
-    <textarea placeholder="Week focus 3"></textarea>
+    <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
+    <textarea class="goal-green" placeholder="Week focus 2"></textarea>
+    <textarea class="goal-red" placeholder="Week focus 3"></textarea>
   `;
   content.appendChild(weekDiv);
 
@@ -235,9 +252,9 @@ for(let m=2;m<12;m++){
       weekDiv.className="week";
       weekDiv.innerHTML=`
         <div class="week-title">WEEK ${weekCount}</div>
-        <textarea placeholder="Week focus 1"></textarea>
-        <textarea placeholder="Week focus 2"></textarea>
-        <textarea placeholder="Week focus 3"></textarea>
+        <textarea class="goal-blue" placeholder="Week focus 1"></textarea>
+        <textarea class="goal-green" placeholder="Week focus 2"></textarea>
+        <textarea class="goal-red" placeholder="Week focus 3"></textarea>
       `;
       content.appendChild(weekDiv);
     }
@@ -252,9 +269,9 @@ for(let m=2;m<12;m++){
           <span>${dayName}</span>
           <span class="day-date">${dateText}</span>
         </div>
-        <input type="checkbox">
-        <input type="checkbox">
-        <input type="checkbox">
+        <input type="checkbox" class="cb-blue">
+        <input type="checkbox" class="cb-green">
+        <input type="checkbox" class="cb-red">
       </div>
     `;
   }
