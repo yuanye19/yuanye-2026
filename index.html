@@ -14,21 +14,7 @@ body{
   margin:40px 24px;
   background:#fff;
   color:#111;
-  /* ===== Mobile 50% Scale ===== */
-
-  .year {
-    font-size: 16px;   /* 原本 32px → 16px */
-  }
-
-  .time {
-    font-size: 16px;   /* 原本 32px → 16px */
-    padding: 4px 8px;
-  }
-
-  .date {
-    font-size: 9px;
-  }
-
+}
 
 /* LOGO */
 .logo{
@@ -119,6 +105,24 @@ textarea{
 input[type="checkbox"]{
   width:16px;
   height:16px;
+}
+
+/* ===== MOBILE: 50% SCALE ===== */
+@media screen and (max-width: 768px) {
+
+  .year {
+    font-size:16px !important;
+  }
+
+  .time {
+    font-size:16px !important;
+    padding:4px 8px !important;
+  }
+
+  .date {
+    font-size:9px !important;
+  }
+
 }
 </style>
 </head>
