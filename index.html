@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YUANYE 2026</title>
 
-<!-- Supabase CDN 只加载一次 -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -23,9 +22,7 @@ body{
   align-items:center;
   margin-bottom:40px;
 }
-.logo img{
-  width:140px;
-}
+.logo img{ width:140px; }
 .logo-name{
   margin-top:10px;
   font-size:14px;
@@ -44,9 +41,7 @@ body{
   font-weight:600;
   letter-spacing:3px;
 }
-.clock{
-  text-align:right;
-}
+.clock{text-align:right;}
 .time{
   background:#000;
   color:#fff;
@@ -82,31 +77,32 @@ textarea{
   margin-bottom:6px;
   font-size:12px;
 }
-.month{
-  margin-bottom:50px;
-}
-.month-content{
-  display:none;
-  margin-top:15px;
-}
-.month.active .month-content{
-  display:block;
-}
-.week{
-  margin-top:20px;
-}
+.month{ margin-bottom:50px; }
+.month-content{ display:none; margin-top:15px; }
+.month.active .month-content{ display:block; }
+
+.week{ margin-top:20px; }
+
 .days-grid{
   display:grid;
-  grid-template-columns:60px repeat(3,20px);
+  grid-template-columns:1fr repeat(3,20px);
   gap:6px;
   align-items:center;
   margin-top:6px;
 }
+
+.day-left{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+}
+
+.day-name{ font-weight:500; }
+.day-date{ opacity:0.6; }
+
 input[type="checkbox"]{
   width:16px;
   height:16px;
-}
-  
 }
 </style>
 </head>
@@ -121,7 +117,7 @@ input[type="checkbox"]{
 <div class="header">
   <div class="year">2026</div>
   <div class="clock">
-    <div class="time" id="time">00:00:00</div>
+    <div class="time" id="time"></div>
     <div class="date" id="date"></div>
   </div>
 </div>
@@ -135,26 +131,18 @@ input[type="checkbox"]{
 
 <script>
 
-/* ========= SUPABASE ========= */
-
+/* SUPABASE */
 const supabaseUrl = "https://cbktbimwqilzhanxthln.supabase.co";
 const supabaseKey = "sb_publishable_O1Wv4Qg9GO19JFD2Veu49A_-6sQBDpm";
-
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-/* SAVE FUNCTION */
 async function saveToCloud(key,value){
   if(value === undefined || value === null) return;
-
   await supabaseClient
     .from("entries")
-    .upsert(
-      { key:key, value:String(value) },
-      { onConflict:"key" }
-    );
+    .upsert({ key:key, value:String(value) },{ onConflict:"key" });
 }
 
-/* AUTO SAVE */
 document.addEventListener("input",e=>{
   if(e.target.dataset.key){
     saveToCloud(e.target.dataset.key,e.target.value);
@@ -163,23 +151,17 @@ document.addEventListener("input",e=>{
 
 document.addEventListener("change",e=>{
   if(e.target.dataset.key){
-    const val = e.target.type === "checkbox"
-      ? e.target.checked
-      : e.target.value;
-
+    const val = e.target.type==="checkbox" ? e.target.checked : e.target.value;
     saveToCloud(e.target.dataset.key,val);
   }
 });
 
-/* LOAD FUNCTION */
 async function loadAll(){
   const { data } = await supabaseClient.from("entries").select("*");
   if(!data) return;
-
   data.forEach(row=>{
     const el=document.querySelector(`[data-key="${row.key}"]`);
     if(!el) return;
-
     if(el.type==="checkbox"){
       el.checked=row.value==="true";
     }else{
@@ -203,7 +185,6 @@ updateClock();
 const container=document.getElementById("container");
 const today=new Date();
 const currentMonthIndex=today.getMonth();
-let current=new Date("2026-01-01");
 
 for(let m=0;m<12;m++){
 
@@ -211,7 +192,7 @@ for(let m=0;m<12;m++){
   monthDiv.className="month";
   if(m===currentMonthIndex) monthDiv.classList.add("active");
 
-  const monthName=current.toLocaleString('default',{month:'long',year:'numeric'});
+  const monthName=new Date(2026,m).toLocaleString('default',{month:'long',year:'numeric'});
 
   monthDiv.innerHTML=`
     <h2 onclick="this.parentElement.classList.toggle('active')">${monthName}</h2>
@@ -225,51 +206,48 @@ for(let m=0;m<12;m++){
 
   const content=monthDiv.querySelector(".month-content");
 
-for(let w = 0; w < 6; w++){
+  for(let w=0; w<6; w++){
 
-  let weekHTML = `
-  <div class="week">
-    <div class="section-title">WEEK ${w+1} FOCUS (3)</div>
-    <textarea data-key="m${m}w${w}_1"></textarea>
-    <textarea data-key="m${m}w${w}_2"></textarea>
-    <textarea data-key="m${m}w${w}_3"></textarea>
-  `;
+    let weekHTML=`
+    <div class="week">
+      <div class="section-title">WEEK ${w+1} FOCUS (3)</div>
+      <textarea data-key="m${m}w${w}_1"></textarea>
+      <textarea data-key="m${m}w${w}_2"></textarea>
+      <textarea data-key="m${m}w${w}_3"></textarea>
+    `;
 
-  for(let d = 0; d < 7; d++){
+    for(let d=0; d<7; d++){
 
-    // 直接用 2026 年 + 当前月份 + 日期计算
-    const dateObj = new Date(2026, m, 1 + w*7 + d);
+      const dateObj = new Date(2026, m, 1 + w*7 + d);
+      if(dateObj.getMonth() !== m) continue;
 
-    // 如果已经跨到下个月就跳过
-    if(dateObj.getMonth() !== m) continue;
+      const monthNum = String(m+1).padStart(2,'0');
+      const dayNum = String(dateObj.getDate()).padStart(2,'0');
 
-    const monthNum = String(m + 1).padStart(2,'0');
-    const dayNum = String(dateObj.getDate()).padStart(2,'0');
+      const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      const dayLabel=dayNames[dateObj.getDay()];
 
-    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const dayLabel = dayNames[dateObj.getDay()];
+      weekHTML+=`
+      <div class="days-grid">
+        <div class="day-left">
+          <span class="day-name">${dayLabel}</span>
+          <span class="day-date">${monthNum}/${dayNum}</span>
+        </div>
+        <input type="checkbox" data-key="m${m}w${w}d${d}a">
+        <input type="checkbox" data-key="m${m}w${w}d${d}b">
+        <input type="checkbox" data-key="m${m}w${w}d${d}c">
+      </div>`;
+    }
 
-    weekHTML += `
-    <div class="days-grid">
-      <div>${dayLabel} ${monthNum}/${dayNum}</div>
-      <input type="checkbox" data-key="m${m}w${w}d${d}a">
-      <input type="checkbox" data-key="m${m}w${w}d${d}b">
-      <input type="checkbox" data-key="m${m}w${w}d${d}c">
-    </div>`;
-  }
-
-  weekHTML += `</div>`;
-  content.innerHTML += weekHTML;
-
+    weekHTML+=`</div>`;
+    content.innerHTML+=weekHTML;
   }
 
   container.appendChild(monthDiv);
-  current.setMonth(current.getMonth()+1);
 }
 
 loadAll();
 
 </script>
-
 </body>
 </html>
