@@ -161,7 +161,11 @@ document.addEventListener("input",e=>{
 
 document.addEventListener("change",e=>{
   if(e.target.dataset.key){
-    saveToCloud(e.target.dataset.key,e.target.checked);
+    const val = e.target.type === "checkbox"
+      ? e.target.checked
+      : e.target.value;
+
+    saveToCloud(e.target.dataset.key,val);
   }
 });
 
