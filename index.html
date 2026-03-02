@@ -13,6 +13,14 @@ body{
   color:#111;
 }
 
+/* LOGO */
+.logo{
+  text-align:center;
+  margin-bottom:40px;
+  font-size:14px;
+  letter-spacing:4px;
+}
+
 /* HEADER */
 .header{
   display:flex;
@@ -20,37 +28,74 @@ body{
   align-items:center;
   margin-bottom:50px;
 }
-.year{
+
+.slogan{
   font-size:28px;
-  font-weight:500;
   line-height:1.2;
   text-transform:uppercase;
 }
+
+.clock{
+  text-align:right;
+}
+
 .time{
   background:#000;
   color:#fff;
   font-size:32px;
   padding:8px 14px;
 }
+
 .date{
   font-size:12px;
   margin-top:6px;
 }
 
+/* SECTION */
+.section{
+  margin-bottom:60px;
+}
+
+.section h2{
+  font-size:14px;
+  border-bottom:1px solid #000;
+  padding-bottom:6px;
+  margin-bottom:12px;
+}
+
+textarea{
+  width:100%;
+  border:none;
+  border-bottom:1px solid #eee;
+  resize:none;
+  outline:none;
+  margin-bottom:8px;
+  font-size:12px;
+}
+
 /* MONTH */
-.month{ margin-bottom:50px; }
-.month-content{ display:none; margin-top:20px; }
-.month.active .month-content{ display:block; }
+.month{
+  margin-bottom:50px;
+}
+
+.month-content{
+  display:none;
+  margin-top:15px;
+}
+
+.month.active .month-content{
+  display:block;
+}
 
 .week{
-  margin-bottom:25px;
+  margin-bottom:20px;
   padding-bottom:10px;
   border-bottom:1px solid #eee;
 }
 
 .week-title{
   font-size:11px;
-  margin-bottom:8px;
+  margin-bottom:6px;
   letter-spacing:1px;
 }
 
@@ -68,7 +113,9 @@ body{
   justify-content:space-between;
 }
 
-.day-date{ opacity:0.5; }
+.day-date{
+  opacity:0.5;
+}
 
 input[type="checkbox"]{
   width:16px;
@@ -77,7 +124,7 @@ input[type="checkbox"]{
 
 /* MOBILE */
 @media screen and (max-width:768px){
-  .year{ font-size:16px !important; }
+  .slogan{ font-size:16px !important; }
   .time{ font-size:16px !important; padding:4px 8px !important; }
   .date{ font-size:9px !important; }
 }
@@ -86,14 +133,23 @@ input[type="checkbox"]{
 
 <body>
 
+<div class="logo">YUANYE</div>
+
 <div class="header">
-  <div class="year">
+  <div class="slogan">
     TAKE RISK,<br>DON'T REGRET.
   </div>
-  <div>
+  <div class="clock">
     <div class="time" id="time"></div>
     <div class="date" id="date"></div>
   </div>
+</div>
+
+<div class="section">
+  <h2>YEAR GOALS (3)</h2>
+  <textarea></textarea>
+  <textarea></textarea>
+  <textarea></textarea>
 </div>
 
 <div id="container"></div>
@@ -112,10 +168,10 @@ function updateClock(){
 setInterval(updateClock,1000);
 updateClock();
 
-/* GENERATE 2026 FROM MARCH 1 */
+/* GENERATE 2026 FROM MARCH */
 const container=document.getElementById("container");
 
-for(let m=2;m<12;m++){   // 2 = March
+for(let m=2;m<12;m++){
 
   const monthDiv=document.createElement("div");
   monthDiv.className="month";
@@ -127,7 +183,16 @@ for(let m=2;m<12;m++){   // 2 = March
     <h2 onclick="this.parentElement.classList.toggle('active')">
       ${monthName}
     </h2>
-    <div class="month-content"></div>
+    <div class="month-content">
+
+      <div class="section">
+        <h2>MONTH FOCUS (3)</h2>
+        <textarea></textarea>
+        <textarea></textarea>
+        <textarea></textarea>
+      </div>
+
+    </div>
   `;
 
   const content=monthDiv.querySelector(".month-content");
@@ -136,19 +201,29 @@ for(let m=2;m<12;m++){   // 2 = March
   let weekCount=1;
   let weekDiv=document.createElement("div");
   weekDiv.className="week";
-  weekDiv.innerHTML=`<div class="week-title">WEEK ${weekCount}</div>`;
+  weekDiv.innerHTML=`
+    <div class="week-title">WEEK ${weekCount}</div>
+    <textarea placeholder="Week focus 1"></textarea>
+    <textarea placeholder="Week focus 2"></textarea>
+    <textarea placeholder="Week focus 3"></textarea>
+  `;
   content.appendChild(weekDiv);
 
   for(let d=1; d<=daysInMonth; d++){
 
     const dateObj=new Date(2026,m,d);
-    const weekday=dateObj.getDay(); // Sunday=0
+    const weekday=dateObj.getDay();
 
     if(d!==1 && weekday===0){
       weekCount++;
       weekDiv=document.createElement("div");
       weekDiv.className="week";
-      weekDiv.innerHTML=`<div class="week-title">WEEK ${weekCount}</div>`;
+      weekDiv.innerHTML=`
+        <div class="week-title">WEEK ${weekCount}</div>
+        <textarea placeholder="Week focus 1"></textarea>
+        <textarea placeholder="Week focus 2"></textarea>
+        <textarea placeholder="Week focus 3"></textarea>
+      `;
       content.appendChild(weekDiv);
     }
 
